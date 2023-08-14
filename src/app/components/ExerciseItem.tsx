@@ -68,7 +68,7 @@ export type Exercise = {
     week: number | null
 }
 
-export default function ExerciseItem(exercise : Exercise) {
+export default function ExerciseItem({ handleRemove, exercise } : { handleRemove: any, exercise: Exercise}) {
     const {
         type,
         nReps,
@@ -77,12 +77,22 @@ export default function ExerciseItem(exercise : Exercise) {
         secsRest 
     } = exercise
 
+    console.log('rendering ' + type.title)
     return (
-        <div className="bg-white rounded-lg shadow-md p-4">
+        <div className="bg-white rounded-lg shadow-md p-4 flex">
+        
+        <div className="flex-grow">
+
         <h4 className="text-xl font-semibold mb-2">{type.title}</h4>
         <p className="text-gray-600 mb-4">{type.description}</p>
           {/* <button onClick={() => startExercise(exercise)} /> */}
         <Timer reps={nReps} seconds={secsPerRep} sets={nSets} rest={secsRest} />
+        </div>
+        
+        <button className="float-right" id={type.title} onClick={handleRemove}>
+        <svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+        </svg></button>
     </div>
     )
 }

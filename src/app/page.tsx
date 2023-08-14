@@ -1,7 +1,8 @@
 'use client'
 
 import ExerciseItem, { Exercise, EXERCISE_TYPES } from './components/ExerciseItem'
-import { useState } from 'react';
+import ExerciseInput from './components/ExerciseInput';
+import { useState, useEffect } from 'react';
 
 const EXERCISES = [
   {
@@ -48,7 +49,7 @@ const EXERCISES = [
     type: EXERCISE_TYPES.quadSets,
     nReps: 10,
     nSets: 3,
-    secsPerRep: 5,
+    secsPerRep: 12,
     secsRest: 5,
     week: 1,
   },
@@ -105,13 +106,30 @@ const EXERCISES = [
 export default function Home() {
   const [selectedWeek, setSelectedWeek] = useState<number>(1);
 
-  const exerciseItems = EXERCISES.filter((e) => e.week && e.week <= selectedWeek).map((e, i) => {
-   return (<div key={i} className="mb-4"><ExerciseItem {...e} /></div>)
+  const [exercises, setExercises] = useState<Exercise[]>(
+    JSON.parse(localStorage.getItem('exercises') || JSON.stringify(EXERCISES))
+  );
+
+  useEffect(() => {
+    localStorage.setItem('exercises', JSON.stringify(exercises));
+  }, [exercises]);
+
+  const handleAddExercise = (exercise: any) => {
+    setExercises([exercise, ...exercises]);
+  };
+
+  const handleRemoveExercise = (e: Exercise) => (() => {
+    setExercises(exercises.filter((ex) => ex.type.title !== e.type.title));
+  });
+
+  const exerciseItems = exercises.filter((e) => e.week && e.week <= selectedWeek).map((e, i) => {
+   return (<div key={i} className="mb-4">
+      <ExerciseItem exercise={e} handleRemove={handleRemoveExercise(e)} />
+  </div>)
   });
   const handleWeekToggle = (week: number) => {
     setSelectedWeek(week);
   };
-
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
@@ -124,9 +142,10 @@ export default function Home() {
         <button className="m-2 bg-blue-500 rounded-lg px-4 py-2 text-white font-semibold"  onClick={() => handleWeekToggle(3)}>Week 3</button>
         <button className="m-2 bg-blue-500 rounded-lg px-4 py-2 text-white font-semibold"  onClick={() => handleWeekToggle(4)}>Week 4</button>
       </div>
+      <ExerciseInput onAddExercise={handleAddExercise} />
+
       {exerciseItems}
       </div>
-
     </main>
   )
 }
